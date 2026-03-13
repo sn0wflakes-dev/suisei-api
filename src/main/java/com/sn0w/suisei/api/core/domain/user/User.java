@@ -41,6 +41,25 @@ public class User {
         );
     }
 
+    public static User reconstruct(
+            String userId,
+            String username,
+            String hashedPassword,
+            String firstName,
+            String lastName,
+            String email,
+            String phoneNumber
+    ) {
+        return new User(
+                UserId.of(username),
+                Username.of(username),
+                Name.of(firstName, lastName),
+                HashedPassword.of(hashedPassword),
+                Email.of(email),
+                PhoneNumber.of(phoneNumber)
+        );
+    }
+
     public UserId getUserId() {
         return userId;
     }
