@@ -1,9 +1,9 @@
 package com.sn0w.suisei.api.core.domain.user;
 
-public class HashedPassword {
+public class Password {
     private final String value;
 
-    private HashedPassword(String value) {
+    private Password(String value) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Password can't be null or empty");
         }
@@ -11,8 +11,8 @@ public class HashedPassword {
         this.value = value;
     }
 
-    public static HashedPassword of(String value) {
-        return new HashedPassword(value);
+    public static Password of(String value) {
+        return new Password(value);
     }
 
     public String getValue() {

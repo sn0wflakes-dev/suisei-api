@@ -4,7 +4,7 @@ public class User {
     private final UserId userId;
     private final Username username;
     private final Name name;
-    private final HashedPassword hashedPassword;
+    private final Password password;
     private final Email email;
     private final PhoneNumber phoneNumber;
 
@@ -12,13 +12,13 @@ public class User {
             UserId userId,
             Username username,
             Name name,
-            HashedPassword hashedPassword,
+            Password password,
             Email email,
             PhoneNumber phoneNumber) {
         this.userId = userId;
         this.username = username;
         this.name = name;
-        this.hashedPassword = hashedPassword;
+        this.password = password;
         this.email = email;
         this.phoneNumber = phoneNumber;
     }
@@ -35,7 +35,7 @@ public class User {
                 UserId.generateId(),
                 Username.of(username),
                 Name.of(firstName, lastName),
-                HashedPassword.of(hashedPassword),
+                Password.of(hashedPassword),
                 Email.of(email),
                 PhoneNumber.of(phoneNumber)
         );
@@ -54,7 +54,7 @@ public class User {
                 UserId.of(username),
                 Username.of(username),
                 Name.of(firstName, lastName),
-                HashedPassword.of(hashedPassword),
+                Password.of(hashedPassword),
                 Email.of(email),
                 PhoneNumber.of(phoneNumber)
         );
@@ -68,8 +68,8 @@ public class User {
         return username;
     }
 
-    public HashedPassword getHashedPassword() {
-        return hashedPassword;
+    public Password getHashedPassword() {
+        return password;
     }
 
     public Email getEmail() {
