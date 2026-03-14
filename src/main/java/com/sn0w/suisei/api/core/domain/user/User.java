@@ -25,7 +25,7 @@ public class User {
 
     public static User of(
             String username,
-            String hashedPassword,
+            String password,
             String firstName,
             String lastName,
             String email,
@@ -35,7 +35,7 @@ public class User {
                 UserId.generateId(),
                 Username.of(username),
                 Name.of(firstName, lastName),
-                Password.of(hashedPassword),
+                Password.of(password),
                 Email.of(email),
                 PhoneNumber.of(phoneNumber)
         );
@@ -51,7 +51,7 @@ public class User {
             String phoneNumber
     ) {
         return new User(
-                UserId.of(username),
+                UserId.of(userId),
                 Username.of(username),
                 Name.of(firstName, lastName),
                 Password.of(hashedPassword),
@@ -68,7 +68,7 @@ public class User {
         return username;
     }
 
-    public Password getHashedPassword() {
+    public Password getPassword() {
         return password;
     }
 
