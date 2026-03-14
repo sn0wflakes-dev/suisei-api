@@ -1,6 +1,8 @@
 package com.sn0w.suisei.api.infra.config;
 
 import com.sn0w.suisei.api.infra.filter.JwtFilter;
+import com.sn0w.suisei.api.infra.security.error.JwtAccessDeniedHandler;
+import com.sn0w.suisei.api.infra.security.error.JwtEntryPointHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,10 +17,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final JwtEntryPointHandler jwtEntryPointHandler;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     public SecurityConfig(
-            JwtFilter jwtFilter) {
+            JwtFilter jwtFilter,
+            JwtEntryPointHandler jwtEntryPointHandler,
+            JwtAccessDeniedHandler jwtAccessDeniedHandler) {
         this.jwtFilter = jwtFilter;
+        this.jwtEntryPointHandler = jwtEntryPointHandler;
+        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
     }
 
     @Bean
@@ -37,6 +45,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jwtEntryPointHandler)
+                        .accessDeniedHandler(jwtAccessDeniedHandler))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

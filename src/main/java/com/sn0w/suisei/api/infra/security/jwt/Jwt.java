@@ -2,7 +2,6 @@ package com.sn0w.suisei.api.infra.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
@@ -26,7 +26,7 @@ public class Jwt {
 
     private SecretKey getSignKey() {
         try {
-            byte[] keyBytes = Decoders.BASE64.decode(secret);
+            byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
             return Keys.hmacShaKeyFor(keyBytes);
         } catch (Throwable t) {
             log.error(t);
@@ -35,26 +35,16 @@ public class Jwt {
     }
 
     public String generateToken(UserDetails userDetails) {
-        log.debug(">>> 1 secret={} expire={}", secret, expire);
-
         SecretKey key = getSignKey();
-        log.debug(">>> 2 key ok: {}", key.getAlgorithm());
-
         Date now = new Date();
-        log.debug(">>> 3 issuedAt={}", now);
-
         Date exp = new Date(System.currentTimeMillis() + expire);
-        log.debug(">>> 4 expiration={}", exp);
 
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .issuedAt(now)
                 .expiration(exp)
                 .signWith(key)
                 .compact();
-
-        log.debug(">>> 5 token={}", token);
-        return token;
     }
 
     public String extractUsername(String token) {
