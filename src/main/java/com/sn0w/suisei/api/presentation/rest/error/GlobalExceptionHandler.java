@@ -1,6 +1,7 @@
 package com.sn0w.suisei.api.presentation.rest.error;
 
 import com.sn0w.suisei.api.core.exception.user.EmailAlreadyExist;
+import com.sn0w.suisei.api.core.exception.user.InvalidCredential;
 import com.sn0w.suisei.api.core.exception.user.PhoneNumberAlreadyExist;
 import com.sn0w.suisei.api.core.exception.user.UsernameAlreadyExist;
 import com.sn0w.suisei.api.presentation.rest.model.response.WebRes;
@@ -58,6 +59,23 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameAlreadyExist.class)
     public ResponseEntity<WebRes<String>> usernameAlreadyExistEx(UsernameAlreadyExist ex, HttpServletRequest http) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(WebRes.<String>builder()
+                        .meta(WebRes.Meta.builder()
+                                .requestId(UUID.randomUUID().toString())
+                                .timestamp(OffsetDateTime.now().toString())
+                                .build())
+                        .error(WebRes.Error.builder()
+                                .errorCode(ex.getCode())
+                                .message(ex.getMessage())
+                                .build())
+                        .path(http.getRequestURI())
+                        .build());
+    }
+
+    // Domain Exception
+    @ExceptionHandler(InvalidCredential.class)
+    public ResponseEntity<WebRes<String>> invalidCredentialEx(InvalidCredential ex, HttpServletRequest http) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(WebRes.<String>builder()
                         .meta(WebRes.Meta.builder()
                                 .requestId(UUID.randomUUID().toString())

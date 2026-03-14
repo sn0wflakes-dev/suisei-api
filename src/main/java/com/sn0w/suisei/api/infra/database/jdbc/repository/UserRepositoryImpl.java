@@ -23,12 +23,12 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void addUser(User user) {
         try {
-            String sql = "INSERT INTO users (id, username, password, first_name, last_name, email, phone_number) " +
-                    "VALUES (:userId, :username, :hashedPassword, :firstName, :lastName, :email, :phoneNumber)";
+            String sql = "INSERT INTO users (id, identifier, password, first_name, last_name, email, phone_number) " +
+                    "VALUES (:userId, :identifier, :hashedPassword, :firstName, :lastName, :email, :phoneNumber)";
 
             MapSqlParameterSource param = new MapSqlParameterSource()
                     .addValue("userId", user.getUserId().getValue())
-                    .addValue("username", user.getUsername().getValue())
+                    .addValue("identifier", user.getUsername().getValue())
                     .addValue("hashedPassword", user.getPassword().getValue())
                     .addValue("firstName", user.getName().getFirstName())
                     .addValue("lastName", user.getName().getLastName())

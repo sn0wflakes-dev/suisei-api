@@ -4,8 +4,10 @@ import com.sn0w.suisei.api.app.service.ValidationService;
 import com.sn0w.suisei.api.app.usecase.AuthenticationUsecase;
 import com.sn0w.suisei.api.core.domain.user.User;
 import com.sn0w.suisei.api.presentation.rest.mapper.UserMapper;
+import com.sn0w.suisei.api.presentation.rest.model.request.UserLoginReq;
 import com.sn0w.suisei.api.presentation.rest.model.request.UserRegisterReq;
 import com.sn0w.suisei.api.presentation.rest.model.response.WebRes;
+import com.sn0w.suisei.api.presentation.rest.model.response.auth.UserLoginRes;
 import com.sn0w.suisei.api.presentation.rest.model.response.auth.UserRegisterRes;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
@@ -52,6 +54,34 @@ public class AuthenticationController {
                 .data(UserRegisterRes.builder()
                                 .message("Success add user")
                                 .build())
+                .path(http.getRequestURI())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(
+            path = "/login",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<WebRes<UserLoginRes>> loginController(
+            @RequestBody UserLoginReq request,
+            HttpServletRequest http) {
+
+        validationService.validate(request);
+
+        User data = authenticationUsecase.login(request.identifier(), request.password());
+
+        WebRes<UserLoginRes> response = WebRes.<UserLoginRes>builder()
+                .meta(WebRes.Meta.builder()
+                        .requestId(UUID.randomUUID().toString())
+                        .timestamp(OffsetDateTime.now().toString())
+                        .build())
+                .data(UserLoginRes.builder()
+                        .identifier(data.getUsername().getValue())
+                        .message("Login success")
+                        .build())
                 .path(http.getRequestURI())
                 .build();
 
