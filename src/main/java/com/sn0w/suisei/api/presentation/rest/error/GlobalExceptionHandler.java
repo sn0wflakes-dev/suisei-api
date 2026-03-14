@@ -7,6 +7,8 @@ import com.sn0w.suisei.api.core.exception.user.UsernameAlreadyExist;
 import com.sn0w.suisei.api.presentation.rest.model.response.WebRes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,6 +22,8 @@ import java.util.UUID;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final static Logger log = LogManager.getLogger(GlobalExceptionHandler.class);
 
     // Domain Exception
     @ExceptionHandler(EmailAlreadyExist.class)
@@ -119,7 +123,8 @@ public class GlobalExceptionHandler {
 
     // Generic Exception
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<WebRes<String>> genericEx(HttpServletRequest http) {
+    public ResponseEntity<WebRes<String>> genericEx(Exception e, HttpServletRequest http) {
+        log.error(e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(WebRes.<String>builder()
                         .meta(WebRes.Meta.builder()
