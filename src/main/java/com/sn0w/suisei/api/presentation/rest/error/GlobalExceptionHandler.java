@@ -123,8 +123,7 @@ public class GlobalExceptionHandler {
 
     // Generic Exception
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<WebRes<String>> genericEx(Exception e, HttpServletRequest http) {
-        log.error(e);
+    public ResponseEntity<WebRes<String>> genericEx(HttpServletRequest http) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(WebRes.<String>builder()
                         .meta(WebRes.Meta.builder()

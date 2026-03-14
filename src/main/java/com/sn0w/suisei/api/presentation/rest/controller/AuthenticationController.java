@@ -81,35 +81,26 @@ public class AuthenticationController {
     public ResponseEntity<WebRes<UserLoginRes>> loginController(
             @RequestBody UserLoginReq request,
             HttpServletRequest http) {
+        validationService.validate(request);
 
-        try {
-            validationService.validate(request);
-
-            User data = authenticationUsecase.login(request.identifier(), request.password());
-            log.debug("User Info : {}", data.getUserId());
-            UserDetails userDetails = userDetailsService.loadUserByUsername(data.getUsername().getValue());
-            log.debug(userDetails.getUsername());
-            String token = jwt.generateToken(userDetails);
-            log.debug("Token : {}", token);
+        User data = authenticationUsecase.login(request.identifier(), request.password());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(data.getUsername().getValue());
+        String token = jwt.generateToken(userDetails);
 
 
-            WebRes<UserLoginRes> response = WebRes.<UserLoginRes>builder()
-                    .meta(WebRes.Meta.builder()
-                            .requestId(UUID.randomUUID().toString())
-                            .timestamp(OffsetDateTime.now().toString())
-                            .build())
-                    .data(UserLoginRes.builder()
-                            .identifier(data.getUsername().getValue())
-                            .token(token)
-                            .message("Login success")
-                            .build())
-                    .path(http.getRequestURI())
-                    .build();
+        WebRes<UserLoginRes> response = WebRes.<UserLoginRes>builder()
+                .meta(WebRes.Meta.builder()
+                        .requestId(UUID.randomUUID().toString())
+                        .timestamp(OffsetDateTime.now().toString())
+                        .build())
+                .data(UserLoginRes.builder()
+                        .identifier(data.getUsername().getValue())
+                        .token(token)
+                        .message("Login success")
+                        .build())
+                .path(http.getRequestURI())
+                .build();
 
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+        return ResponseEntity.ok(response);
     }
 }

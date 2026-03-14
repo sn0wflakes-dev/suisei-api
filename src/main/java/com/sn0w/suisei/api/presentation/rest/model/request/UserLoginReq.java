@@ -5,10 +5,10 @@ import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBl
 import org.jspecify.annotations.NonNull;
 
 public record UserLoginReq(
-        @NotBlank(message = "Username or Email is requierd")
+        @NotBlank(message = "Username or Email is required")
         String identifier,
 
-        @NotBlank(message = "Password is requierd")
+        @NotBlank(message = "Password is required")
         String password
 ) {
 }
