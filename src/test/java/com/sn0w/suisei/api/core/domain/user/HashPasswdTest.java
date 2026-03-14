@@ -7,7 +7,7 @@ public class HashPasswdTest {
     @Test
     public void emailOnSuccess() {
         String expectHashPass = "secret";
-        HashedPassword password = HashedPassword.of("secret");
+        Password password = Password.of("secret");
 
         Assertions.assertEquals(expectHashPass, password.getValue());
     }
@@ -15,7 +15,7 @@ public class HashPasswdTest {
     @Test
     public void emailOnFailWithNullValue() {
         Exception ex = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            HashedPassword.of(null);
+            Password.of(null);
         });
 
         String errMessage = "null";
@@ -27,7 +27,7 @@ public class HashPasswdTest {
     @Test
     public void emailOnFailWithEmptyValue() {
         Exception ex = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            HashedPassword.of(" ");
+            Password.of(" ");
         });
 
         String errMessage = "empty";
