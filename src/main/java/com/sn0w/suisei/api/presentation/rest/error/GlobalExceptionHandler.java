@@ -1,5 +1,7 @@
 package com.sn0w.suisei.api.presentation.rest.error;
 
+import com.sn0w.suisei.api.core.exception.otp.OtpExpire;
+import com.sn0w.suisei.api.core.exception.otp.OtpNotMatch;
 import com.sn0w.suisei.api.core.exception.user.EmailAlreadyExist;
 import com.sn0w.suisei.api.core.exception.user.InvalidCredential;
 import com.sn0w.suisei.api.core.exception.user.PhoneNumberAlreadyExist;
@@ -80,6 +82,40 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidCredential.class)
     public ResponseEntity<WebRes<String>> invalidCredentialEx(InvalidCredential ex, HttpServletRequest http) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(WebRes.<String>builder()
+                        .meta(WebRes.Meta.builder()
+                                .requestId(UUID.randomUUID().toString())
+                                .timestamp(OffsetDateTime.now().toString())
+                                .build())
+                        .error(WebRes.Error.builder()
+                                .errorCode(ex.getCode())
+                                .message(ex.getMessage())
+                                .build())
+                        .path(http.getRequestURI())
+                        .build());
+    }
+
+    // Domain Exception
+    @ExceptionHandler(OtpExpire.class)
+    public ResponseEntity<WebRes<String>> otpExpireEx(OtpExpire ex, HttpServletRequest http) {
+        return ResponseEntity.status(HttpStatus.GONE)
+                .body(WebRes.<String>builder()
+                        .meta(WebRes.Meta.builder()
+                                .requestId(UUID.randomUUID().toString())
+                                .timestamp(OffsetDateTime.now().toString())
+                                .build())
+                        .error(WebRes.Error.builder()
+                                .errorCode(ex.getCode())
+                                .message(ex.getMessage())
+                                .build())
+                        .path(http.getRequestURI())
+                        .build());
+    }
+
+    // Domain Exception
+    @ExceptionHandler(OtpNotMatch.class)
+    public ResponseEntity<WebRes<String>> otpNotMatchEx(OtpNotMatch ex, HttpServletRequest http) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
                 .body(WebRes.<String>builder()
                         .meta(WebRes.Meta.builder()
                                 .requestId(UUID.randomUUID().toString())
