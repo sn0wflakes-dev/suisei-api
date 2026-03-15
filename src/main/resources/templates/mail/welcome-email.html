@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 480px; margin: 40px auto; background: #fff;
+                     border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header { background: #e64553; padding: 24px; text-align: center; }
+        .header h1 { color: #fff; margin: 0; font-size: 20px; }
+        .body { padding: 32px; }
+        .welcome-box { background: #F3F4F6; border-radius: 8px; text-align: center;
+                       padding: 24px; margin: 24px 0; }
+        .welcome-box .emoji { font-size: 40px; display: block; margin-bottom: 8px; }
+        .welcome-box .tagline { font-size: 16px; font-weight: bold; color: #e64553; }
+        .divider { border: none; border-top: 1px solid #F3F4F6; margin: 24px 0; }
+        .info-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+        .info-item .icon { font-size: 16px; margin-top: 2px; }
+        .info-item p { margin: 0; font-size: 14px; color: #374151; line-height: 1.5; }
+        .footer { text-align: center; padding: 16px; font-size: 12px; color: #9CA3AF; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Selamat Datang di Suisei App!</h1>
+    </div>
+    <div class="body">
+        <p>Halo, <strong th:text="${name}">User</strong>!</p>
+        <p>Akun kamu telah berhasil diverifikasi dan siap untuk digunakan.</p>
+
+        <div class="welcome-box">
+            <span class="emoji">🎉</span>
+            <div class="tagline">Akun Kamu Sudah Aktif</div>
+        </div>
+
+        <hr class="divider"/>
+
+        <div class="info-item">
+            <span class="icon">📧</span>
+            <p>Email terdaftar: <strong th:text="${email}">user@email.com</strong></p>
+        </div>
+        <div class="info-item">
+            <span class="icon">📅</span>
+            <p>Terdaftar pada: <strong th:text="${registeredAt}">1 Januari 2025</strong></p>
+        </div>
+
+        <hr class="divider"/>
+
+        <p style="font-size: 14px; color: #6B7280;">
+            Jika kamu tidak merasa membuat akun ini, segera hubungi tim support kami.
+        </p>
+    </div>
+    <div class="footer">
+        <p>Email ini dikirim secara otomatis, mohon tidak membalas email ini.</p>
+        <p>&copy; 2025 Suisei App</p>
+    </div>
+</div>
+</body>
+</html>

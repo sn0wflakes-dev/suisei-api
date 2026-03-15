@@ -41,6 +41,25 @@ public class Email {
         );
     }
 
+    public static Email welcomeMail(
+            String recipient,
+            String name,
+            String registeredEmail,
+            String registeredAt
+    ) {
+        return new Email(
+                Recipient.of(recipient),
+                Subject.of("Welcome to suisei"),
+                Template.of("mail/welcome-email"),
+                Data.of(Map.of(
+                        "name",          name,
+                        "email",       registeredEmail,
+                        "registeredAt", registeredAt
+                )),
+                Type.WELCOME
+        );
+    }
+
     public Recipient getRecipient() {
         return recipient;
     }

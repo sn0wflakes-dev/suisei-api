@@ -8,6 +8,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.OffsetDateTime;
+
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
@@ -47,12 +49,28 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User deleteUserById(String userId) {
-        return null;
+    public Boolean verifyUserById(String userId) {
+        try {
+            String sql = "UPDATE users " +
+                    "SET verified = true, updated_at = :updatedAt " +
+                    "WHERE id = :userId";
+
+            MapSqlParameterSource param = new MapSqlParameterSource()
+                    .addValue("userId", userId)
+                    .addValue("updatedAt", OffsetDateTime.now());
+
+            int rowAffected = namedParameterJdbcTemplate.update(sql, param);
+            return rowAffected > 0;
+        } catch (Exception e) {
+            log.error("[ERROR:DAO] Failed to verify with userId : {}. Error details : {}",
+                    userId,
+                    e.getMessage());
+            throw e;
+        }
     }
 
     @Override
-    public User updateUserById(String userId) {
+    public User deleteUserById(String userId) {
         return null;
     }
 }

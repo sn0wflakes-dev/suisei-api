@@ -8,12 +8,16 @@ import com.sn0w.suisei.api.core.domain.user.User;
 import com.sn0w.suisei.api.core.exception.otp.OtpExpire;
 import com.sn0w.suisei.api.core.exception.otp.OtpNotMatch;
 import com.sn0w.suisei.api.core.exception.user.UserNotFound;
+import com.sn0w.suisei.api.core.repository.UserRepository;
 import com.sn0w.suisei.api.infra.database.jpa.entity.UserEntity;
 import com.sn0w.suisei.api.infra.database.jpa.repository.UserJpaRepository;
 import com.sn0w.suisei.api.infra.database.redis.repository.RedisRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class OtpService implements OtpUsecase {
@@ -22,14 +26,17 @@ public class OtpService implements OtpUsecase {
 
     private final RedisRepository redis;
     private final UserJpaRepository repository;
+    private final UserRepository userRepository;
     private final EmailUsecase email;
 
     public OtpService(
             RedisRepository redis,
             UserJpaRepository repository,
+            UserRepository userRepository,
             EmailUsecase email) {
         this.redis = redis;
         this.repository = repository;
+        this.userRepository = userRepository;
         this.email = email;
     }
 
@@ -73,13 +80,45 @@ public class OtpService implements OtpUsecase {
 
     @Override
     public void verifyOtp(String username, String code) {
-        String otp = redis.getValue(username);
-        if (otp == null || otp.isBlank()) {
-            throw new OtpExpire();
-        }
+        try {
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd MMMM yyyy");
 
-        if (!otp.equals(code)) {
-            throw new OtpNotMatch();
+            UserEntity user = repository.findByUsername(username).orElseThrow(
+                    () -> new UserNotFound(username)
+            );
+
+            User reconstruct = User.reconstruct(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getPassword(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getEmail(),
+                    user.getPhoneNumber()
+            );
+
+            String otp = redis.getValue(username);
+            if (otp == null || otp.isBlank()) {
+                throw new OtpExpire();
+            }
+
+            if (!otp.equals(code)) {
+                throw new OtpNotMatch();
+            }
+
+            if (userRepository.verifyUserById(reconstruct.getUserId().getValue())) {
+                email.send(Email.welcomeMail(
+                        reconstruct.getEmail().getValue(),
+                        reconstruct.getName().getFullName(),
+                        reconstruct.getEmail().getValue(),
+                        user.getCreatedAt().format(fmt)));
+            }
+
+            redis.deleteValue(username);
+        } catch (Exception e) {
+            log.error("[ERROR:SERVICE] Failed to verify otp for : {}, error details : {}",
+                    username,
+                    e.getMessage());
         }
     }
 }

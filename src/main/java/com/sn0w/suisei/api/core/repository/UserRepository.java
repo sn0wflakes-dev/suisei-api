@@ -6,5 +6,5 @@ import com.sn0w.suisei.api.core.domain.user.UserId;
 public interface UserRepository {
     void addUser(User user);
     User deleteUserById(String userId);
-    User updateUserById(String userId);
+    Boolean verifyUserById(String userId);
 }
