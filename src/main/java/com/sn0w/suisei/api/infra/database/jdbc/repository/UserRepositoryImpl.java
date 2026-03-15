@@ -23,7 +23,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void addUser(User user) {
         try {
-            String sql = "INSERT INTO users (id, identifier, password, first_name, last_name, email, phone_number) " +
+            String sql = "INSERT INTO users (id, username, password, first_name, last_name, email, phone_number) " +
                     "VALUES (:userId, :identifier, :hashedPassword, :firstName, :lastName, :email, :phoneNumber)";
 
             MapSqlParameterSource param = new MapSqlParameterSource()
