@@ -2,7 +2,7 @@ package com.sn0w.suisei.api.core.domain.email;
 
 import java.util.Map;
 
-public class Email {
+public class Email{
     private final Recipient recipient;
     private final Subject subject;
     private final Template template;
