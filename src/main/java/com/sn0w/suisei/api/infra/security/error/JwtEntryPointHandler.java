@@ -1,7 +1,7 @@
 package com.sn0w.suisei.api.infra.security.error;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sn0w.suisei.api.presentation.rest.model.response.WebRes;
+import com.sn0w.suisei.api.adapter.inbound.rest.model.response.WebRes;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
