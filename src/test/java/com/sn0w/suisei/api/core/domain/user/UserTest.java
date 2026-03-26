@@ -26,14 +26,14 @@ public class UserTest {
         // ensure not null
         Assertions.assertNotNull(user.getUserId().getValue());
         Assertions.assertNotNull(user.getUsername().getValue());
-        Assertions.assertNotNull(user.getHashedPassword().getValue());
+        Assertions.assertNotNull(user.getPassword().getValue());
         Assertions.assertNotNull(user.getName().getFullName());
         Assertions.assertNotNull(user.getPhoneNumber().getValue());
         Assertions.assertNotNull(user.getEmail().getValue());
 
         // ensure same with expected value
         Assertions.assertEquals(username, user.getUsername().getValue());
-        Assertions.assertEquals(hashPassword, user.getHashedPassword().getValue());
+        Assertions.assertEquals(hashPassword, user.getPassword().getValue());
         Assertions.assertEquals(firstName, user.getName().getFirstName());
         Assertions.assertEquals(lastName, user.getName().getLastName());
         Assertions.assertEquals(fullName, user.getName().getFullName());
