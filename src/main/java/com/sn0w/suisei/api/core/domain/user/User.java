@@ -35,7 +35,7 @@ public class User {
                 UserId.generateId(),
                 Username.of(username),
                 Name.of(firstName, lastName),
-                Password.of(password),
+                RawPassword.of(password),
                 Email.of(email),
                 PhoneNumber.of(phoneNumber)
         );
@@ -54,7 +54,7 @@ public class User {
                 UserId.of(userId),
                 Username.of(username),
                 Name.of(firstName, lastName),
-                Password.of(hashedPassword),
+                HashedPassword.of(hashedPassword),
                 Email.of(email),
                 PhoneNumber.of(phoneNumber)
         );
