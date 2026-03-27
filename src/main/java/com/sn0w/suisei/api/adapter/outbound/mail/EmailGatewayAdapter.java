@@ -1,6 +1,6 @@
 package com.sn0w.suisei.api.adapter.outbound.mail;
 
-import com.sn0w.suisei.api.application.port.outbound.gateway.EmailUsecase;
+import com.sn0w.suisei.api.application.port.outbound.gateway.EmailGatewayPort;
 import com.sn0w.suisei.api.core.domain.email.Email;
 import jakarta.mail.internet.MimeMessage;
 import org.apache.logging.log4j.LogManager;
@@ -14,9 +14,9 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 @Component
-public class EmailGateway implements EmailUsecase {
+public class EmailGatewayAdapter implements EmailGatewayPort {
 
-    private static final Logger log = LogManager.getLogger(EmailGateway.class);
+    private static final Logger log = LogManager.getLogger(EmailGatewayAdapter.class);
 
     private final JavaMailSender javaMailSender;
     private final TemplateEngine templateEngine;
@@ -24,7 +24,7 @@ public class EmailGateway implements EmailUsecase {
     @Value("${email.from}")
     private String sender;
 
-    public EmailGateway(
+    public EmailGatewayAdapter(
             JavaMailSender javaMailSender,
             TemplateEngine templateEngine) {
         this.javaMailSender = javaMailSender;

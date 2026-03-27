@@ -1,6 +1,6 @@
 package com.sn0w.suisei.api.application.service;
 
-import com.sn0w.suisei.api.application.port.outbound.gateway.EmailUsecase;
+import com.sn0w.suisei.api.application.port.outbound.gateway.EmailGatewayPort;
 import com.sn0w.suisei.api.application.port.inbound.OtpUsecase;
 import com.sn0w.suisei.api.core.domain.email.Email;
 import com.sn0w.suisei.api.core.domain.otp.Otp;
@@ -26,13 +26,13 @@ public class OtpService implements OtpUsecase {
     private final RedisRepository redis;
     private final UserJpaRepository repository;
     private final UserRepository userRepository;
-    private final EmailUsecase email;
+    private final EmailGatewayPort email;
 
     public OtpService(
             RedisRepository redis,
             UserJpaRepository repository,
             UserRepository userRepository,
-            EmailUsecase email) {
+            EmailGatewayPort email) {
         this.redis = redis;
         this.repository = repository;
         this.userRepository = userRepository;
@@ -109,7 +109,6 @@ public class OtpService implements OtpUsecase {
                 email.send(Email.welcomeMail(
                         reconstruct.getEmail().getValue(),
                         reconstruct.getName().getFullName(),
-                        reconstruct.getEmail().getValue(),
                         user.getCreatedAt().format(fmt)));
             }
 

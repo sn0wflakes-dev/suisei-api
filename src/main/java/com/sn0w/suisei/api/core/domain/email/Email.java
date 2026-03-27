@@ -44,7 +44,6 @@ public class Email{
     public static Email welcomeMail(
             String recipient,
             String name,
-            String registeredEmail,
             String registeredAt
     ) {
         return new Email(
@@ -53,7 +52,7 @@ public class Email{
                 Template.of("mail/welcome-email"),
                 Data.of(Map.of(
                         "name",          name,
-                        "email",       registeredEmail,
+                        "email",       recipient,
                         "registeredAt", registeredAt
                 )),
                 Type.WELCOME
