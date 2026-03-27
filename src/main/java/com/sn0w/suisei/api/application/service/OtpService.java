@@ -1,8 +1,10 @@
 package com.sn0w.suisei.api.application.service;
 
+import com.sn0w.suisei.api.application.port.outbound.event.EventPublisher;
 import com.sn0w.suisei.api.application.port.outbound.gateway.EmailGatewayPort;
 import com.sn0w.suisei.api.application.port.inbound.OtpUsecase;
 import com.sn0w.suisei.api.core.domain.email.Email;
+import com.sn0w.suisei.api.core.domain.event.UserRegisteredEvent;
 import com.sn0w.suisei.api.core.domain.otp.Otp;
 import com.sn0w.suisei.api.core.domain.user.User;
 import com.sn0w.suisei.api.core.exception.otp.OtpExpire;
@@ -27,16 +29,19 @@ public class OtpService implements OtpUsecase {
     private final UserJpaRepository repository;
     private final UserRepository userRepository;
     private final EmailGatewayPort email;
+    private final EventPublisher eventPublisher;
 
     public OtpService(
             RedisRepository redis,
             UserJpaRepository repository,
             UserRepository userRepository,
-            EmailGatewayPort email) {
+            EmailGatewayPort email,
+            EventPublisher eventPublisher) {
         this.redis = redis;
         this.repository = repository;
         this.userRepository = userRepository;
         this.email = email;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -106,10 +111,13 @@ public class OtpService implements OtpUsecase {
             }
 
             if (userRepository.verifyUserById(reconstruct.getUserId().getValue())) {
-                email.send(Email.welcomeMail(
-                        reconstruct.getEmail().getValue(),
-                        reconstruct.getName().getFullName(),
-                        user.getCreatedAt().format(fmt)));
+                eventPublisher.publish(UserRegisteredEvent.invoke(
+                        user.getUsername(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getEmail(),
+                        user.getCreatedAt()
+                ));
             }
 
             redis.deleteValue(username);

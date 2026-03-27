@@ -4,7 +4,9 @@ import com.sn0w.suisei.api.application.port.inbound.EmailUseCase;
 import com.sn0w.suisei.api.application.port.outbound.gateway.EmailGatewayPort;
 import com.sn0w.suisei.api.core.domain.email.Email;
 import com.sn0w.suisei.api.core.domain.event.UserRegisteredEvent;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EmailService implements EmailUseCase {
 
     private final EmailGatewayPort email;
