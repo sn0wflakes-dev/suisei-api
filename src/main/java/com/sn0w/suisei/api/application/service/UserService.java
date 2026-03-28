@@ -1,6 +1,7 @@
 package com.sn0w.suisei.api.application.service;
 
 import com.sn0w.suisei.api.application.port.inbound.UserUsecase;
+import com.sn0w.suisei.api.core.domain.shared.Timestamp;
 import com.sn0w.suisei.api.core.domain.user.User;
 import com.sn0w.suisei.api.core.exception.user.UserNotFound;
 import com.sn0w.suisei.api.adapter.outbound.database.jpa.entity.UserEntity;
@@ -22,6 +23,8 @@ public class UserService implements UserUsecase {
                 () -> new UserNotFound(username)
         );
 
+        Timestamp timestamp = Timestamp.of(user.getCreatedAt(), user.getUpdatedAt());
+
         return User.reconstruct(
                 user.getId(),
                 user.getUsername(),
@@ -29,7 +32,8 @@ public class UserService implements UserUsecase {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                user.getPhoneNumber()
+                user.getPhoneNumber(),
+                timestamp
         );
     }
 }

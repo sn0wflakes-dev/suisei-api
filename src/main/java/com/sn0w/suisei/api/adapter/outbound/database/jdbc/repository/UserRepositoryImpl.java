@@ -1,7 +1,10 @@
 package com.sn0w.suisei.api.adapter.outbound.database.jdbc.repository;
 
+import com.sn0w.suisei.api.adapter.outbound.database.jdbc.mapper.UserMapper;
+import com.sn0w.suisei.api.adapter.outbound.database.jpa.repository.UserJpaRepository;
 import com.sn0w.suisei.api.core.domain.user.User;
 import com.sn0w.suisei.api.application.port.outbound.repository.UserRepository;
+import com.sn0w.suisei.api.core.exception.user.UserNotFound;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -15,10 +18,13 @@ public class UserRepositoryImpl implements UserRepository {
 
     private static final Logger log = LogManager.getLogger(UserRepositoryImpl.class);
 
+    private final UserJpaRepository userJpaRepository;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public UserRepositoryImpl(
+            UserJpaRepository userJpaRepository,
             NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.userJpaRepository = userJpaRepository;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
@@ -67,6 +73,13 @@ public class UserRepositoryImpl implements UserRepository {
                     e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    public User findUserByUsername(String username) {
+        return userJpaRepository.findByUsername(username).map(UserMapper::toDomain).orElseThrow(
+                () -> new  UserNotFound(username)
+        );
     }
 
     @Override

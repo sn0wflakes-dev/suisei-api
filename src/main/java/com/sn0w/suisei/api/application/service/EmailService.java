@@ -3,6 +3,7 @@ package com.sn0w.suisei.api.application.service;
 import com.sn0w.suisei.api.application.port.inbound.EmailUseCase;
 import com.sn0w.suisei.api.application.port.outbound.gateway.EmailGatewayPort;
 import com.sn0w.suisei.api.core.domain.email.Email;
+import com.sn0w.suisei.api.core.domain.event.GenerateOtpEvent;
 import com.sn0w.suisei.api.core.domain.event.UserRegisteredEvent;
 import org.springframework.stereotype.Service;
 
@@ -22,5 +23,15 @@ public class EmailService implements EmailUseCase {
                 event.getName().getFullName(),
                 event.getRegisteredAt()
         ));
+    }
+
+    @Override
+    public void otpMail(GenerateOtpEvent event) {
+        email.send(Email.otpMail(
+                event.getEmail().getValue(),
+                event.getFullName(),
+                event.getCode().getValue(),
+                event.getMinutes())
+        );
     }
 }
