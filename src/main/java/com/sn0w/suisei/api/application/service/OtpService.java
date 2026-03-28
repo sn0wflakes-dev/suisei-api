@@ -1,22 +1,18 @@
 package com.sn0w.suisei.api.application.service;
 
-import com.sn0w.suisei.api.application.port.outbound.gateway.EmailUsecase;
+import com.sn0w.suisei.api.application.port.outbound.event.EventPublisher;
 import com.sn0w.suisei.api.application.port.inbound.OtpUsecase;
-import com.sn0w.suisei.api.core.domain.email.Email;
+import com.sn0w.suisei.api.core.domain.event.GenerateOtpEvent;
+import com.sn0w.suisei.api.core.domain.event.UserRegisteredEvent;
 import com.sn0w.suisei.api.core.domain.otp.Otp;
 import com.sn0w.suisei.api.core.domain.user.User;
 import com.sn0w.suisei.api.core.exception.otp.OtpExpire;
 import com.sn0w.suisei.api.core.exception.otp.OtpNotMatch;
-import com.sn0w.suisei.api.core.exception.user.UserNotFound;
 import com.sn0w.suisei.api.application.port.outbound.repository.UserRepository;
-import com.sn0w.suisei.api.adapter.outbound.database.jpa.entity.UserEntity;
-import com.sn0w.suisei.api.adapter.outbound.database.jpa.repository.UserJpaRepository;
 import com.sn0w.suisei.api.adapter.outbound.database.redis.repository.RedisRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
-
-import java.time.format.DateTimeFormatter;
 
 @Service
 public class OtpService implements OtpUsecase {
@@ -24,48 +20,39 @@ public class OtpService implements OtpUsecase {
     private static final Logger log = LogManager.getLogger(OtpService.class);
 
     private final RedisRepository redis;
-    private final UserJpaRepository repository;
     private final UserRepository userRepository;
-    private final EmailUsecase email;
+    private final EventPublisher eventPublisher;
 
     public OtpService(
             RedisRepository redis,
-            UserJpaRepository repository,
             UserRepository userRepository,
-            EmailUsecase email) {
+            EventPublisher eventPublisher) {
         this.redis = redis;
-        this.repository = repository;
         this.userRepository = userRepository;
-        this.email = email;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
     public void generateOtp(String username) {
         try {
-            UserEntity user = repository.findByUsername(username).orElseThrow(
-                    () -> new UserNotFound(username)
-            );
 
-            User reconstruct = User.reconstruct(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getPassword(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getEmail(),
-                    user.getPhoneNumber()
-            );
+            User user = userRepository.findUserByUsername(username);
 
             Otp data = Otp.of(username);
 
             redis.deleteValue(username);
-            redis.setValue(data.getId().getUsername(), data.getCode().getValue(), 300);
-            
-            email.send(Email.otpMail(
-                            reconstruct.getEmail().getValue(),
-                            reconstruct.getName().getFullName(),
-                            redis.getValue(username),
-                            String.valueOf(300/60)));
+
+            redis.setValue(
+                    data.getId().getUsername(),
+                    data.getCode().getValue(),
+                    data.getTimeToLive());
+
+            eventPublisher.publish(GenerateOtpEvent.invoke(
+                    user.getEmail().getValue(),
+                    user.getName().getFullName(),
+                    redis.getValue(username),
+                    String.valueOf(300/60)
+            ));
 
             log.debug(redis.getValue(username));
 
@@ -80,21 +67,8 @@ public class OtpService implements OtpUsecase {
     @Override
     public void verifyOtp(String username, String code) {
         try {
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd MMMM yyyy");
 
-            UserEntity user = repository.findByUsername(username).orElseThrow(
-                    () -> new UserNotFound(username)
-            );
-
-            User reconstruct = User.reconstruct(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getPassword(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getEmail(),
-                    user.getPhoneNumber()
-            );
+            User user = userRepository.findUserByUsername(username);
 
             String otp = redis.getValue(username);
             if (otp == null || otp.isBlank()) {
@@ -105,12 +79,14 @@ public class OtpService implements OtpUsecase {
                 throw new OtpNotMatch();
             }
 
-            if (userRepository.verifyUserById(reconstruct.getUserId().getValue())) {
-                email.send(Email.welcomeMail(
-                        reconstruct.getEmail().getValue(),
-                        reconstruct.getName().getFullName(),
-                        reconstruct.getEmail().getValue(),
-                        user.getCreatedAt().format(fmt)));
+            if (userRepository.verifyUserById(user.getUserId().getValue())) {
+                eventPublisher.publish(UserRegisteredEvent.invoke(
+                        user.getUsername().getValue(),
+                        user.getName().getFirstName(),
+                        user.getName().getLastName(),
+                        user.getEmail().getValue(),
+                        user.getTimestamp().getUpdatedAt()
+                ));
             }
 
             redis.deleteValue(username);

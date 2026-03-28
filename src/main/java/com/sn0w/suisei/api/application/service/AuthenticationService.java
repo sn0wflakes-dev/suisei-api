@@ -1,6 +1,8 @@
 package com.sn0w.suisei.api.application.service;
 
+import com.sn0w.suisei.api.adapter.outbound.database.jdbc.mapper.UserMapper;
 import com.sn0w.suisei.api.application.port.inbound.AuthenticationUsecase;
+import com.sn0w.suisei.api.application.port.inbound.command.UserRegisterCommand;
 import com.sn0w.suisei.api.core.domain.user.User;
 import com.sn0w.suisei.api.core.exception.user.EmailAlreadyExist;
 import com.sn0w.suisei.api.core.exception.user.InvalidCredential;
@@ -17,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class AuthenticationService implements AuthenticationUsecase, UserDetailsService {
@@ -37,19 +40,18 @@ public class AuthenticationService implements AuthenticationUsecase, UserDetails
     }
 
     @Override
-    public void register(User user) {
+    public void register(UserRegisterCommand command) {
         try {
 
-            String bcryptHash = passwordEncoder.encode(user.getPassword().getValue());
+            String password = passwordEncoder.encode(command.rawPassword().getValue());
 
-            User reconstructedUser = User.reconstruct(
-                    user.getUserId().getValue(),
-                    user.getUsername().getValue(),
-                    bcryptHash,
-                    user.getName().getFirstName(),
-                    user.getName().getLastName(),
-                    user.getEmail().getValue(),
-                    user.getPhoneNumber().getValue()
+            User user = User.create(
+                    command.username().getValue(),
+                    password,
+                    command.name().getFirstName(),
+                    command.name().getLastName(),
+                    command.email().getValue(),
+                    command.phoneNumber().getValue()
             );
 
             // Check identifier
@@ -73,12 +75,11 @@ public class AuthenticationService implements AuthenticationUsecase, UserDetails
                     }
             );
 
-            userRepository.addUser(reconstructedUser);
+            userRepository.addUser(user);
 
-            log.info("[SUCCESS:SERVICE] Success to add user with userId : {}", user.getUserId().getValue());
+            log.info("[SUCCESS:SERVICE] Success to add user with username : {}", command.username());
         } catch (Exception e) {
-            log.error("[ERROR:SERVICE] Failed to add user with userId : {}. Error details : {}",
-                    user.getUserId().getValue(),
+            log.error("[ERROR:SERVICE] Failed to add user with username : {}. Error details : {}", command.username(),
                     e.getMessage());
             throw e;
         }
@@ -96,15 +97,7 @@ public class AuthenticationService implements AuthenticationUsecase, UserDetails
 
             log.info("[SUCCESS:SERVICE] Success to authenticate user with identifier : {}", identifier);
 
-            return User.reconstruct(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getPassword(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getEmail(),
-                    user.getPhoneNumber()
-            );
+            return UserMapper.toDomain(user);
 
         } catch (Exception e) {
             log.error("[ERROR:SERVICE] Failed to authenticate user with identifier : {}. Error details : {}",

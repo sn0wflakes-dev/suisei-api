@@ -7,4 +7,5 @@ public interface UserRepository {
     void addUser(User user);
     User deleteUserById(String userId);
     Boolean verifyUserById(String userId);
+    User findUserByUsername(String username);
 }

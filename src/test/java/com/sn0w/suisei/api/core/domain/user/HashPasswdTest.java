@@ -7,15 +7,15 @@ public class HashPasswdTest {
     @Test
     public void emailOnSuccess() {
         String expectHashPass = "secret";
-        Password password = Password.of("secret");
+        HashedPassword hashedPassword = HashedPassword.of("secret");
 
-        Assertions.assertEquals(expectHashPass, password.getValue());
+        Assertions.assertEquals(expectHashPass, hashedPassword.getValue());
     }
 
     @Test
     public void emailOnFailWithNullValue() {
         Exception ex = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            Password.of(null);
+            HashedPassword.of(null);
         });
 
         String errMessage = "null";
@@ -27,7 +27,7 @@ public class HashPasswdTest {
     @Test
     public void emailOnFailWithEmptyValue() {
         Exception ex = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            Password.of(" ");
+            HashedPassword.of(" ");
         });
 
         String errMessage = "empty";

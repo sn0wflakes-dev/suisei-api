@@ -1,5 +1,7 @@
 package com.sn0w.suisei.api.core.domain.user;
 
+import com.sn0w.suisei.api.core.domain.shared.Timestamp;
+
 public class User {
     private final UserId userId;
     private final Username username;
@@ -7,6 +9,7 @@ public class User {
     private final Password password;
     private final Email email;
     private final PhoneNumber phoneNumber;
+    private final Timestamp timestamp;
 
     private User(
             UserId userId,
@@ -14,16 +17,18 @@ public class User {
             Name name,
             Password password,
             Email email,
-            PhoneNumber phoneNumber) {
+            PhoneNumber phoneNumber,
+            Timestamp timestamp) {
         this.userId = userId;
         this.username = username;
         this.name = name;
         this.password = password;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.timestamp = timestamp;
     }
 
-    public static User of(
+    public static User create(
             String username,
             String password,
             String firstName,
@@ -35,9 +40,10 @@ public class User {
                 UserId.generateId(),
                 Username.of(username),
                 Name.of(firstName, lastName),
-                Password.of(password),
+                HashedPassword.of(password),
                 Email.of(email),
-                PhoneNumber.of(phoneNumber)
+                PhoneNumber.of(phoneNumber),
+                Timestamp.create()
         );
     }
 
@@ -48,15 +54,17 @@ public class User {
             String firstName,
             String lastName,
             String email,
-            String phoneNumber
+            String phoneNumber,
+            Timestamp timestamp
     ) {
         return new User(
                 UserId.of(userId),
                 Username.of(username),
                 Name.of(firstName, lastName),
-                Password.of(hashedPassword),
+                HashedPassword.of(hashedPassword),
                 Email.of(email),
-                PhoneNumber.of(phoneNumber)
+                PhoneNumber.of(phoneNumber),
+                timestamp
         );
     }
 
@@ -82,5 +90,9 @@ public class User {
 
     public Name getName() {
         return name;
+    }
+
+    public Timestamp getTimestamp() {
+        return timestamp;
     }
 }

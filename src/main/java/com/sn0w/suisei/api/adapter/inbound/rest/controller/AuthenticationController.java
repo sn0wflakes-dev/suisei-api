@@ -1,5 +1,6 @@
 package com.sn0w.suisei.api.adapter.inbound.rest.controller;
 
+import com.sn0w.suisei.api.application.port.inbound.command.UserRegisterCommand;
 import com.sn0w.suisei.api.application.service.ValidationService;
 import com.sn0w.suisei.api.application.port.inbound.AuthenticationUsecase;
 import com.sn0w.suisei.api.core.domain.user.User;
@@ -56,7 +57,7 @@ public class AuthenticationController {
             HttpServletRequest http) {
         validationService.validate(request);
 
-        User data = UserMapper.registerUserToDomain(request);
+        UserRegisterCommand data = UserMapper.registerUserToDomain(request);
         authenticationUsecase.register(data);
 
         WebRes<UserRegisterRes> response = WebRes.<UserRegisterRes>builder()

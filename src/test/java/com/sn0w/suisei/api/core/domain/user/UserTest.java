@@ -14,7 +14,7 @@ public class UserTest {
         String phoneNumber = "087777102284";
         String email = "sn0w@gmail.com";
 
-        User user = User.of(
+        User user = User.create(
                 "Sn0wflakes",
                 "secret",
                 "Abdurrahman",

@@ -26,6 +26,10 @@ public class Code {
         }
     }
 
+    public static Code of(String value) {
+        return new Code(value);
+    }
+
     public String getValue() {
         return value;
     }
